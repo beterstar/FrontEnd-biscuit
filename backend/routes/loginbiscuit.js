@@ -1,12 +1,13 @@
 const express = require("express")
 const router = express.Router()
-const multer = require("multer")
-const moment = require('moment')
 
-const { logincreate } = require('../controllers/loginController')
+
+const { logincreate} = require('../controllers/loginController')
 const { loginschema } = require('../models/loginSchema')
+const { resetpassword } = require('../controllers/resetpassword')
 
 router.post('/createuser',logincreate)
+
 
 
 

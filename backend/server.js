@@ -6,6 +6,7 @@ require("dotenv").config()
 
 const loginRoute = require('./routes/loginbiscuit')
 const authRoute = require('./routes/auth')
+const resetpassword = require('./routes/reset')
 
 const app = express()
 // connect to cloud database
@@ -25,6 +26,7 @@ app.use(morgan("dev"))
 //route
 app.use('/api',loginRoute)
 app.use('/api',authRoute)
+app.use('/api',resetpassword)
 // app.use('uploads',express.static("./uploads"));
 
 const port = process.env.PORT || 8080

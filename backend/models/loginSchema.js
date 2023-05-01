@@ -18,6 +18,10 @@ const loginSchema = mongoose.Schema({
         type:String,
         required:true,
     },
+    confirmpassword:{
+        type:String,
+        required:true
+    },
     slug:{
         type:String,
         lowercase:true,
