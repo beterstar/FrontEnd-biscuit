@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken')
 const login = require('../models/loginSchema')
+const {expressjwt:expressjwt} = require('express-jwt');
+
 
 
 exports.login = (req,res) =>{
@@ -26,3 +28,10 @@ exports.login = (req,res) =>{
     })
 
 }
+
+// ตรวจสอบ token ด้วย expressJWT
+exports.requireLogin = expressjwt({
+    secret : process.env.JWT_SECRET,
+    algorithms: ["HS256"], //มีหลายตัวให้เลือกใช้
+    userProperty : "auth"
+})

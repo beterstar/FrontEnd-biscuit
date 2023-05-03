@@ -48,8 +48,9 @@ exports.logincreate =  (req,res)=>{
      login.create({username,email,password,confirmpassword,slug},(err,user)=>{
         if(err){
             res.status(400).json({error:"ชื่อผู้ใช้หรืออีเมลถูกใช้ไปแล้ว"})
-        }
+        }else{
         res.json(user)
+        }
     })
 
 }
