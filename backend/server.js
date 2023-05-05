@@ -7,7 +7,7 @@ const bodyParser = require('body-parser')
 const path = require('path')
 
 
-const loginRoute = require('./routes/loginbiscuit')
+const createusers = require('./routes/loginbiscuit')
 const authRoute = require('./routes/auth')
 const resetpassword = require('./routes/reset')
 const fileRoute = require('./routes/fileupload-Route')
@@ -29,7 +29,7 @@ app.use(morgan("dev"))
 app.use(bodyParser.json())
 
 //route
-app.use('/api',loginRoute)
+app.use('/api',createusers.routes)
 app.use('/api',authRoute)
 app.use('/api',resetpassword)
 

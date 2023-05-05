@@ -1,13 +1,15 @@
+'use strict';
 
 const slugify = require('slugify')
 const { v4: uuidv4 } = require('uuid')
 const login = require('../models/loginSchema')
 
 //บันทึกข้อมูลจาก from user
-exports.logincreate =  (req,res)=>{
+   const logincreate = async  ( req,res )=>{
+   try{
     const { username, email , password, confirmpassword } = req.body
 
-    const slug = slugify(username)
+    const slug = typeof username === 'string' ? slugify(username) : uuidv4();
 
     if(!slug) slug = uuidv4()
     switch(true){
@@ -23,7 +25,7 @@ exports.logincreate =  (req,res)=>{
     }
     
     //เช็ค ความถูกต้อง username and email
-    if(!/^[a-zA-z ]*$/.test(username)){
+    if(!/^[a-zA-z0-9 ]*$/.test(username)){
         return res.status(400).json({
             status:"FAILED",
             error:"กรุณาระบุชื่อผู้ใช้เป็นภาษาอังกฤษเท่านั้น"
@@ -45,18 +47,32 @@ exports.logincreate =  (req,res)=>{
         })
     }
 
+    // ------------------------push to database---------------------------
      login.create({username,email,password,confirmpassword,slug},(err,user)=>{
         if(err){
             res.status(400).json({error:"ชื่อผู้ใช้หรืออีเมลถูกใช้ไปแล้ว"})
         }else{
-        res.json(user)
+        res.json({user:user,success:"บันทึกข้อมูลเรียบร้อย"})
+            
         }
     })
 
+    //----------------------------เอาไว้ดัก error------------------------------ 
+   }catch(error){
+     res.status(400).send(error.message)
+   }
 }
+
+
 
 exports.getdatauser = (req,res) =>{
     login.find({}).exec((err,logins)=>{
         res.json(logins)
     })
+}
+
+
+// ------------------export module-----------------
+module.exports = {
+    logincreate
 }

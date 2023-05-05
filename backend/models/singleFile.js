@@ -1,8 +1,12 @@
 const mongoose = require('mongoose');
-const { schema } = require('./loginSchema');
+// const { schema } = require('./loginSchema');
 const Schema = mongoose.Schema;
 
 const singleFileSchema = new Schema({
+    slug:{
+        type:String,
+        required:true
+    },
     fileName : {
         type:String,
         required:true
