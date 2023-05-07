@@ -1,13 +1,14 @@
 'use strict';
-
+const jwt = require('jsonwebtoken')
 const slugify = require('slugify')
 const { v4: uuidv4 } = require('uuid')
 const login = require('../models/loginSchema')
+const nodemailer = require('nodemailer')
 
 //บันทึกข้อมูลจาก from user
    const logincreate = async  ( req,res )=>{
    try{
-    const { username, email , password, confirmpassword } = req.body
+    const { username, email , password, confirmpassword ,images } = req.body
 
     const slug = typeof username === 'string' ? slugify(username) : uuidv4();
 
@@ -22,6 +23,8 @@ const login = require('../models/loginSchema')
         case !password : 
         return res.status(400).json({error:"กรุณาป้อนพาสเวิร์ด"})
         break;
+        case !images :
+        return res.status(400).json({error:"กรุณาอัพโหลดรูปภาพโปรไฟล์ของคุณ"})
     }
     
     //เช็ค ความถูกต้อง username and email
@@ -35,7 +38,7 @@ const login = require('../models/loginSchema')
                     status:"FAILED",
                     error:"รูปแบบอีเมลไม่ถูกต้อง"
                 });
-    }else if(password.length < 5){
+    }else if(password.length <= 5){
         return res.status(400).json({
                     status:"FAILED",
                     error:"กรุณาป้อนพาสเวิร์ดอย่างน้อย 6 ตัว"
@@ -47,19 +50,56 @@ const login = require('../models/loginSchema')
         })
     }
 
-    // ------------------------push to database---------------------------
-     login.create({username,email,password,confirmpassword,slug},(err,user)=>{
-        if(err){
-            res.status(400).json({error:"ชื่อผู้ใช้หรืออีเมลถูกใช้ไปแล้ว"})
-        }else{
-        res.json({user:user,success:"บันทึกข้อมูลเรียบร้อย"})
-            
+    // otp => user => create user
+    const otp =  Math.floor(1000 + Math.random() * 9000);
+    if(email){
+        const transporter =  await nodemailer.createTransport({
+            host: 'smtp-mail.outlook.com',                 
+            service: 'outlook',                            
+            secureConnection: false,
+            tls: {
+                ciphers: 'SSLv3',
+                rejectUnauthorized: false                           
+            },
+            port: 587,                                      
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASSWORD
+            }
+          });
+
+        //send email      
+        const mailOptions = await  {
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: 'This is OTP for reset password',
+            text: `OTP : ${otp}`
+        };
+
+         // OTP Send
+            // await transporter.sendMail(mailOptions, (err, info) => {
+            //     if (err) {
+            //       console.log(err);
+            //     } else {
+            //       console.log(`Email sent: ${info.response}`);
+            //     }
+            //   });
+        const token = await jwt.sign({otp},process.env.JWT_SECRET,{expiresIn:'1d'})
+        res.status(200).json({waiting:"check OTP in your email!",otp:otp,token:token})
         }
-    })
+        
+    // ------------------------push to database---------------------------
+    //  login.create({username,email,password,confirmpassword,images,slug},(err,user)=>{
+    //     if(err){
+    //         res.status(400).json({error:"ชื่อผู้ใช้หรืออีเมลถูกใช้ไปแล้ว"})
+    //     }else{
+    //     res.json({user:user,success:"บันทึกข้อมูลเรียบร้อย"}) 
+    //     }
+    //  })
 
     //----------------------------เอาไว้ดัก error------------------------------ 
    }catch(error){
-     res.status(400).send(error.message)
+     res.status(400).json(error)
    }
 }
 

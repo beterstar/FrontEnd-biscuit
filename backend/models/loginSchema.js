@@ -22,6 +22,10 @@ const loginSchema = mongoose.Schema({
         type:String,
         required:true
     },
+    images:{
+        type:String,
+        required:true
+    },
     slug:{
         type:String,
         lowercase:true,
@@ -29,4 +33,4 @@ const loginSchema = mongoose.Schema({
     }
 },{timestamps:true})
 
-module.exports = mongoose.model("login",loginSchema)
+module.exports = mongoose.model.login || mongoose.model("login",loginSchema)

@@ -20,9 +20,10 @@ exports.login = (req,res) =>{
             //password ไม่ตรงกับที่เก็บในฐานข้อมูล
             res.status(400).json({error:'รหัสผ่านไม่ถูกต้อง'})
         } else {
+            const slug = user.slug
             //username และ password ถูกต้อง || ไม่มี error เข้ามา
             const token = jwt.sign({username},process.env.JWT_SECRET,{expiresIn:'1d'})
-            return res.json({token,username})
+            return res.json({token,username,slug})
             // res.send('เข้าสู่ระบบสำเร็จ')
         }
     })
